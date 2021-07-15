@@ -29,8 +29,8 @@ class SentencePieceTokenizer(Tokenizer):
         if directory and vocab_size and name and model and language:
             self.load(directory, model, language, name, vocab_size)
     
-    def train(self, dataset, directory: str, model: str, 
-              language: str, name: str, vocab_size: int, num_threads: int = 90) -> None:
+    def train(self, dataset, directory: str, model: str, language: str, name: str, 
+              vocab_size: int, num_threads: int = 90, byte_fallback: bool = False) -> None:
         save_location = self.format_model_path(directory, model, name, vocab_size, language)
         print('Saving to: ' + save_location)
         spm.SentencePieceTrainer.train(sentence_iterator=self.dataset_iterator(dataset), 
@@ -39,6 +39,7 @@ class SentencePieceTokenizer(Tokenizer):
                                         model_type=model,
                                         max_sentence_length=4096,
                                         num_threads=num_threads,
+                                        byte_fallback=byte_fallback,
                                         train_extremely_large_corpus=True)        
     
     def load(self, directory: str, model: str, language: str, name: str, vocab_size: int) -> None:
