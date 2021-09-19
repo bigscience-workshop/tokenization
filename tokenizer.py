@@ -20,8 +20,8 @@ class Tokenizer:
     
     def decode(self, tokens: List[int]):
         pass
-    
-    
+
+
 class SentencePieceTokenizer(Tokenizer):
     def __init__(self, directory: str = None, model: str = None, language: str = None, name: str = None, vocab_size: int = None):
         super().__init__()
@@ -30,7 +30,7 @@ class SentencePieceTokenizer(Tokenizer):
             self.load(directory, model, language, name, vocab_size)
     
     def train(self, dataset, directory: str, model: str, language: str, name: str, 
-              vocab_size: int, num_threads: int = 90, byte_fallback: bool = False) -> None:
+              vocab_size: int, num_threads: int = 90, byte_fallback: bool = False, user_defined_symbols: List[str] = []) -> None:
         save_location = self.format_model_path(directory, model, name, vocab_size, language)
         print('Saving to: ' + save_location)
         spm.SentencePieceTrainer.train(sentence_iterator=self.dataset_iterator(dataset), 
@@ -40,6 +40,7 @@ class SentencePieceTokenizer(Tokenizer):
                                         max_sentence_length=4096,
                                         num_threads=num_threads,
                                         byte_fallback=byte_fallback,
+                                        user_defined_symbols=user_defined_symbols,
                                         train_extremely_large_corpus=True)        
     
     def load(self, directory: str, model: str, language: str, name: str, vocab_size: int) -> None:
@@ -53,7 +54,7 @@ class SentencePieceTokenizer(Tokenizer):
     def decode(self, tokens: List[int]) -> str:
         return self.tokenizer.decode(tokens)
 
-            
+
 class HFByteBPETokenizer(Tokenizer):
     def __init__(self, directory: str = None, language: str = None, name: str = None, vocab_size: int = None):
         super().__init__()
