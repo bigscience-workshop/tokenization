@@ -49,7 +49,7 @@ def dataset_iterator(dataset):
 
 def make_folder(folder_path):
     if not os.path.isdir(folder_path):
-        os.mkdirs(folder_path)
+        os.makedirs(folder_path)
 
 def train_tokenizer(train_dataset, segmenter, lg, vocab_size, output_dir=''):
     tokenizer = SentencePieceTokenizer()
