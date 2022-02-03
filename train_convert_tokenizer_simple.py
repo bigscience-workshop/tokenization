@@ -1,40 +1,50 @@
+from pathlib import Path
+
 import sentencepiece as spm
 from datasets import load_dataset
 from transformers.convert_slow_tokenizer import SpmConverter
 import argparse, os
 
+def get_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--vocab_size", "-v", type=int, required=True)
+    parser.add_argument("--data_name", "-d", type=str, required=True)
+    parser.add_argument("--output_folder", "-o", type=Path, required=True)
+    parser.add_argument("--num_threads", "-th", type=int, required=True)
+    return parser.parse_args()
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--vocab_size", "-v", type=int, required=False, default=150000)
-parser.add_argument("--data_name", "-d", type=str, required=True)
-parser.add_argument("--output_folder", "-o", type=str, required=False, default='./')
-parser.add_argument("--num_threads", "-th", type=int, required=False, default=90)
-
-
-tokenizer_path = os.path.join(args.output_folder, "tokenizer")
-
-def dataset_iterator(self, dataset):
+def dataset_iterator(dataset):
     for i in range(len(dataset)):
         yield dataset[i]["text"] # assume relevant data is stored in 'text' field (datasets convention)
-
 
 class SPMTokenizer:
     def __init__(self, vocab_file):
         self.vocab_file = vocab_file
 
+def main():
+    args = get_args()
 
-dataset = load_dataset(args.data_name)
+    tokenizer_path = args.output_folder / "tokenizer"
 
-spm.SentencePieceTrainer.train(sentence_iterator=dataset_iterator(dataset),
-                               model_prefix=tokenizer_path,
-                               vocab_size=args.vocab_size,
-                               model_type="bpe",
-                               max_sentence_length=4096,
-                               num_threads=args.num_threads,
-                               byte_fallback=True,
-                               train_extremely_large_corpus=True)
+    dataset = load_dataset(args.data_name)
 
-original_tokenizer = SPMTokenizer(tokenizer_path + ".model")
-converter = SpmConverter(original_tokenizer)
-hf_tokenizer = converter.converted()
-hf_tokenizer.save(tokenizer_path + ".json")
+    spm.SentencePieceTrainer.train(
+        sentence_iterator=dataset_iterator(dataset),
+        model_prefix=str(tokenizer_path.absolute()),
+        vocab_size=args.vocab_size,
+        model_type="bpe",
+        max_sentence_length=4096,
+        num_threads=args.num_threads,
+        byte_fallback=True,
+        train_extremely_large_corpus=True
+    )
+
+    spm_model_path = tokenizer_path.rename(f"{tokenizer_path.name}.model")
+    original_tokenizer = SPMTokenizer(spm_model_path)
+    converter = SpmConverter(original_tokenizer)
+    hf_tokenizer = converter.converted()
+    tokenizer_json = tokenizer_path.rename(f"{tokenizer_path.name}.json")
+    hf_tokenizer.save(str(tokenizer_json.absolute()))
+
+if __name__ == "__main__":
+    main()
