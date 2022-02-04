@@ -20,16 +20,17 @@ pushd $TOKENIZATION_REPO
 
 echo "Sharding and compressing seed id ${SEED_ID}"
 
-DATASET_PATH= # TODO: define where is concatenated dataset
-SAVE_TOKENIZER_PATH=$six_ALL_CCFRSCRATCH/tokenizer
+DATASET_PATH=$six_ALL_CCFRSCRATCH/tokenizer/tokenizer/dataset/tokenization_dataset # TODO: define where is concatenated dataset
+SAVE_TOKENIZER_PATH=$six_ALL_CCFRSCRATCH/tokenizer/tokenizer
 
 mkdir -p $SAVE_TOKENIZER_PATH
 
 export HF_DATASETS_OFFLINE=1
 export HF_DATASETS_CACHE=$SCRATCH/to_delete
 
+# Tokenization vocabulary size: ceil(150_000 / (8 * 128)) * 8 * 128 - 3 = 150525  (3 refers to bos/eos/pad)
 python train_convert_tokenizer_simple.py \
-    --vocab_size 150000 \
+    --vocab_size 150525 \
     --data_name ${PATH_TO_TOKENIZATION_DS} \
     --output_folder ${OUTPUT_DIR} \
     --num_threads 80
