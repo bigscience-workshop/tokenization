@@ -20,7 +20,7 @@ pushd $TOKENIZATION_REPO
 
 echo "Sharding and compressing seed id ${SEED_ID}"
 
-DATASET_PATH=$six_ALL_CCFRSCRATCH/tokenizer/tokenizer/dataset/tokenization_dataset # TODO: define where is concatenated dataset
+DATASET_PATH=$six_ALL_CCFRSCRATCH/tokenizer/dataset/tokenization_dataset # TODO: define where is concatenated dataset
 SAVE_TOKENIZER_PATH=$six_ALL_CCFRSCRATCH/tokenizer/tokenizer
 
 mkdir -p $SAVE_TOKENIZER_PATH

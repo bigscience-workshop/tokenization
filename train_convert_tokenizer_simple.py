@@ -35,6 +35,10 @@ def main():
         model_type="bpe",
         max_sentence_length=4096,
         num_threads=args.num_threads,
+        unk_id=-1,
+        bos_id=0,
+        eos_id=1,
+        pad_id=2,
         byte_fallback=True,
         train_extremely_large_corpus=True
     )
