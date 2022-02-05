@@ -26,7 +26,7 @@ def main():
 
     tokenizer_path = args.output_folder / "tokenizer"
 
-    dataset = load_dataset(args.data_name)
+    dataset = load_dataset(args.data_name, data_files="**.jsonl.gz", split="train")
 
     spm.SentencePieceTrainer.train(
         sentence_iterator=dataset_iterator(dataset),

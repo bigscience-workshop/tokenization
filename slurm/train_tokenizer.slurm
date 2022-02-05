@@ -28,9 +28,17 @@ mkdir -p $SAVE_TOKENIZER_PATH
 export HF_DATASETS_OFFLINE=1
 export HF_DATASETS_CACHE=$SCRATCH/to_delete
 
-# Tokenization vocabulary size: ceil(150_000 / (8 * 128)) * 8 * 128 - 3 = 150525  (3 refers to bos/eos/pad)
+# Tokenization vocabulary size:
+#   - ceil(150_000 / (8 * 128)) * 8 * 128
+#   - special tokens:
+#       - 1 eos
+#       - 1 bos
+#       - 1 pad
+#       - 200 sentinel tokens
+# ceil(150_000 / (8 * 128)) * 8 * 128 - 203 = 150325
+
 python train_convert_tokenizer_simple.py \
-    --vocab_size 150525 \
+    --vocab_size 150325 \
     --data_name ${DATASET_PATH} \
     --output_folder ${SAVE_TOKENIZER_PATH} \
     --num_threads 80
