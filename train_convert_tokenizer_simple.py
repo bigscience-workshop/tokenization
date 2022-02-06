@@ -30,7 +30,13 @@ def dataset_iterator(dataset, batch_size: int):
     #         yield text
     #
     for i in range(len(dataset)):
-        yield dataset[i]["text"]
+        text = dataset[i]["text"].strip()
+
+        # Remove all whitespaces
+        if not text:
+            continue
+
+        yield text
 
 
 class SPMTokenizer:
@@ -43,6 +49,8 @@ def main():
     tokenizer_path = args.output_folder / "tokenizer"
 
     dataset = load_dataset(args.data_name, data_files="**.jsonl.gz", split="train")
+
+    print(f"Dataset length: {len(dataset)}")
 
     spm.SentencePieceTrainer.train(
         sentence_iterator=dataset_iterator(dataset, args.batch_size),
