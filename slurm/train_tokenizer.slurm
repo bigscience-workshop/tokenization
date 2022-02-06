@@ -41,5 +41,6 @@ python train_convert_tokenizer_simple.py \
     --vocab_size 150325 \
     --data_name ${DATASET_PATH} \
     --output_folder ${SAVE_TOKENIZER_PATH} \
+    --load_batch_size 1000 \
     --num_threads 80
 
