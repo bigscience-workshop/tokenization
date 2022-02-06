@@ -109,7 +109,7 @@ def main():
                 reduce_on_shard,
                 num_shards=args.num_threads,
                 dataset=dataset,
-                batch_size=args.batch_size,
+                batch_size=args.load_batch_size,
                 func=get_max,
                 init_acc=0
             ),
@@ -119,7 +119,7 @@ def main():
     logger.info(f"Max length: {max_length}")
 
     spm.SentencePieceTrainer.train(
-        sentence_iterator=dataset_iterator(dataset, args.batch_size),
+        sentence_iterator=dataset_iterator(dataset, args.load_batch_size),
         model_prefix=str(tokenizer_path.absolute()),
         vocab_size=args.vocab_size,
         model_type="bpe",
