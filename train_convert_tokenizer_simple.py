@@ -29,8 +29,8 @@ def dataset_iterator(dataset, batch_size: int):
     #     for text in batch:
     #         yield text
     #
-    for i in range(len(dataset)):
-        text = dataset[i]["text"].strip()
+    for sample in dataset:
+        text = sample["text"].strip()
 
         # Remove all whitespaces
         if not text:
@@ -51,13 +51,19 @@ def main():
     dataset = load_dataset(args.data_name, data_files="**.jsonl.gz", split="train")
 
     print(f"Dataset length: {len(dataset)}")
+    max_length = 0
+    for sample in dataset:
+        length = len(sample["text"].strip())
+        if max_length < length:
+            max_length = length
+    print(f"Max length: {max_length}")
 
     spm.SentencePieceTrainer.train(
         sentence_iterator=dataset_iterator(dataset, args.batch_size),
         model_prefix=str(tokenizer_path.absolute()),
         vocab_size=args.vocab_size,
         model_type="bpe",
-        max_sentence_length=4096,
+        max_sentence_length=max_length,
         num_threads=args.num_threads,
         unk_id=0,
         bos_id=1,
