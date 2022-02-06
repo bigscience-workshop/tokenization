@@ -68,7 +68,7 @@ class SPMTokenizer:
         self.vocab_file = vocab_file
 
 def reduce_max_text_length_on_shard(index:int, num_shards: int, dataset: Dataset, batch_size: int):
-    shard = dataset.shard(num_shards=num_shards, index=index, contiguous=True)
+    shard = dataset.shard(num_shards=num_shards, index=index)
     return max([len(text) for text in dataset_iterator(shard, batch_size)])
 
 def main():
