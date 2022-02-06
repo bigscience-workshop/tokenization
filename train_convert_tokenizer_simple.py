@@ -33,8 +33,8 @@ def dataset_iterator(dataset, batch_size: int):
         desc="Loading dataset",
     ):
         # Load things by batch.
-        batch = dataset["text"][start: end]
-        for text in batch:
+        batch = dataset[start: end]
+        for text in batch["text"]:
             # Removes None
             if not text:
                 continue
