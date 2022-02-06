@@ -1,9 +1,14 @@
+import logging
 from pathlib import Path
 
 import sentencepiece as spm
 from datasets import load_dataset, utils
+from datasets.utils.logging import set_verbosity_info
 from transformers.convert_slow_tokenizer import SpmConverter
 import argparse, os
+
+set_verbosity_info()
+logger = logging.getLogger(__name__)
 
 def get_args():
     parser = argparse.ArgumentParser()
@@ -30,7 +35,13 @@ def dataset_iterator(dataset, batch_size: int):
     #         yield text
     #
     for sample in dataset:
-        text = sample["text"].strip()
+        text = sample["text"]
+
+        # Removes None
+        if not text:
+            continue
+
+        text = text.strip()
 
         # Remove all whitespaces
         if not text:
@@ -44,19 +55,27 @@ class SPMTokenizer:
         self.vocab_file = vocab_file
 
 def main():
+    # Setup logging
+    logging.basicConfig(
+        format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
+        datefmt="%m/%d/%Y %H:%M:%S",
+        level=logging.INFO,
+    )
     args = get_args()
-
+    logger.info(
+        f"** The job is runned with the following arguments: **\n{args}\n **** "
+    )
     tokenizer_path = args.output_folder / "tokenizer"
 
     dataset = load_dataset(args.data_name, data_files="**.jsonl.gz", split="train")
 
-    print(f"Dataset length: {len(dataset)}")
+    logger.info(f"Dataset length: {len(dataset)}")
     max_length = 0
-    for sample in dataset:
-        length = len(sample["text"].strip())
+    for text in dataset_iterator(dataset, args.batch_size):
+        length = len(text)
         if max_length < length:
             max_length = length
-    print(f"Max length: {max_length}")
+    logger.info(f"Max length: {max_length}")
 
     spm.SentencePieceTrainer.train(
         sentence_iterator=dataset_iterator(dataset, args.batch_size),
