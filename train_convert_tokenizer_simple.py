@@ -47,22 +47,6 @@ def dataset_iterator(dataset, batch_size: int):
 
             yield text
 
-    # for sample in dataset:
-    #     text = sample["text"]
-    #
-    #     # Removes None
-    #     if not text:
-    #         continue
-    #
-    #     text = text.strip()
-    #
-    #     # Remove all whitespaces
-    #     if not text:
-    #         continue
-    #
-    #     yield text
-
-
 class SPMTokenizer:
     def __init__(self, vocab_file):
         self.vocab_file = vocab_file

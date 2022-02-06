@@ -31,11 +31,8 @@ export HF_DATASETS_CACHE=$SCRATCH/to_delete
 # Tokenization vocabulary size:
 #   - ceil(150_000 / (8 * 128)) * 8 * 128
 #   - special tokens:
-#       - 1 eos
-#       - 1 bos
-#       - 1 pad
 #       - 200 sentinel tokens
-# ceil(150_000 / (8 * 128)) * 8 * 128 - 203 = 150325
+# ceil(150_000 / (8 * 128)) * 8 * 128 - 200 = 150325
 
 python train_convert_tokenizer_simple.py \
     --vocab_size 150325 \
