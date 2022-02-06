@@ -67,18 +67,9 @@ class SPMTokenizer:
     def __init__(self, vocab_file):
         self.vocab_file = vocab_file
 
-def reduce_on_shard(index:int, num_shards: int, dataset: Dataset, batch_size: int, func: Callable[[int, str], int], init_acc: int):
-    shard = dataset.shard(num_shards=num_shards, index=index)
-    acc = init_acc
-    for text in dataset_iterator(shard, batch_size):
-        acc = func(acc, text)
-    return acc
-
-def get_max(acc, text):
-    length = len(text)
-    if length > acc:
-        return length
-    return acc
+def reduce_max_text_length_on_shard(index:int, num_shards: int, dataset: Dataset, batch_size: int):
+    shard = dataset.shard(num_shards=num_shards, index=index, contiguous=True)
+    return max([len(text) for text in dataset_iterator(shard, batch_size)])
 
 def main():
     # Setup logging
@@ -106,12 +97,10 @@ def main():
     with Pool(args.num_threads) as pool:
         max_per_shard = pool.map(
             partial(
-                reduce_on_shard,
+                reduce_max_text_length_on_shard,
                 num_shards=args.num_threads,
                 dataset=dataset,
                 batch_size=args.load_batch_size,
-                func=get_max,
-                init_acc=0
             ),
             range(args.num_threads)
         )
