@@ -32,7 +32,7 @@ def dataset_iterator(dataset, batch_size: int, sequence_length: int):
         total=len(slices),
         unit="ba",
         disable=bool(utils.logging.get_verbosity() == utils.logging.NOTSET),
-        desc="Loading dataset",
+        desc="Loading dataset to sentencepiece",
     ):
         # Load things by batch.
         batch = dataset[start: end]
