@@ -24,8 +24,10 @@ def get_args():
 
     return parser.parse_args()
 
-def dataset_iterator(dataset, batch_size: int, sequence_length: int):
-    # # WIP
+def dataset_iterator(dataset, batch_size: int, sequence_length_in_byte: int):
+    # FIXME: we use an approximation of byte length vs byte sequence
+    sequence_length = sequence_length_in_byte // 2
+
     slices = [(start, min(len(dataset), start + batch_size)) for start in range(0, len(dataset), batch_size)]
     for start, end in utils.tqdm(
         slices,
@@ -106,11 +108,15 @@ def main():
     # logger.info(f"Max length: {max_length}")
 
     spm.SentencePieceTrainer.train(
-        sentence_iterator=dataset_iterator(dataset, args.load_batch_size, args.max_sequence_length),
+        sentence_iterator=dataset_iterator(
+            dataset,
+            args.load_batch_size,
+            sequence_length_in_byte=args.max_sequence_length
+        ),
         model_prefix=str(tokenizer_path.absolute()),
         vocab_size=args.vocab_size,
         model_type="bpe",
-        max_sentence_length=args.max_sequence_length * 2, # number of bytes main be bigger than the number of tokens.
+        max_sentence_length=args.max_sequence_length,
         num_threads=args.num_threads,
         unk_id=0,
         bos_id=1,

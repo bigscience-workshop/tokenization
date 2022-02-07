@@ -39,6 +39,6 @@ python train_convert_tokenizer_simple.py \
     --data_name ${DATASET_PATH} \
     --output_folder ${SAVE_TOKENIZER_PATH} \
     --load_batch_size 1000 \
-    --max_sequence_length 1000000 \
+    --max_sequence_length 65536 \
     --num_threads 80
 
