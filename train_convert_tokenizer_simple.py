@@ -43,10 +43,6 @@ def dataset_iterator(dataset, batch_size: int, sequence_length: int):
 
             text = text.strip()
 
-            # Remove all whitespaces
-            if not text:
-                continue
-
             # shard text to be into substrings of size < sequence length
             rest = text
             while rest != "":
@@ -62,9 +58,9 @@ class SPMTokenizer:
     def __init__(self, vocab_file):
         self.vocab_file = vocab_file
 
-def reduce_max_text_length_on_shard(index:int, num_shards: int, dataset: Dataset, batch_size: int):
-    shard = dataset.shard(num_shards=num_shards, index=index)
-    return max([len(text) for text in dataset_iterator(shard, batch_size)])
+# def reduce_max_text_length_on_shard(index:int, num_shards: int, dataset: Dataset, batch_size: int):
+#     shard = dataset.shard(num_shards=num_shards, index=index)
+#     return max([len(text) for text in dataset_iterator(shard, batch_size)])
 
 def main():
     # Setup logging
