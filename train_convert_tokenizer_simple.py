@@ -50,9 +50,13 @@ def dataset_iterator(dataset, batch_size: int, sequence_length: int):
             # shard text to be into substrings of size < sequence length
             rest = text
             while rest != "":
-                substring = rest[:sequence_length].rsplit(" ", 1)[0]
-                rest = rest[len(substring):]
-                yield substring
+                if len(rest) <= sequence_length:
+                    rest = ""
+                    yield rest
+                else:
+                    substring = rest[:sequence_length].rsplit(" ", 1)[0]
+                    rest = rest[len(substring):]
+                    yield substring
 
 class SPMTokenizer:
     def __init__(self, vocab_file):
