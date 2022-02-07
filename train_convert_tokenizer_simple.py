@@ -20,9 +20,11 @@ def get_args():
     parser.add_argument("--output_folder", "-o", type=Path, required=True)
     parser.add_argument("--num_threads", "-th", type=int, required=True)
     parser.add_argument("--load_batch_size", type=int, default=1)
+    parser.add_argument("--max_sequence_length", type=int, required=True)
+
     return parser.parse_args()
 
-def dataset_iterator(dataset, batch_size: int):
+def dataset_iterator(dataset, batch_size: int, sequence_length: int):
     # # WIP
     slices = [(start, min(len(dataset), start + batch_size)) for start in range(0, len(dataset), batch_size)]
     for start, end in utils.tqdm(
@@ -45,7 +47,12 @@ def dataset_iterator(dataset, batch_size: int):
             if not text:
                 continue
 
-            yield text
+            # shard text to be into substrings of size < sequence length
+            rest = text
+            while rest != "":
+                substring = text[:sequence_length].rsplit(" ", 1)[0]
+                rest = text[len(substring):]
+                yield substring
 
 class SPMTokenizer:
     def __init__(self, vocab_file):
@@ -77,26 +84,26 @@ def main():
     #     if max_length < length:
     #         max_length = length
 
-    # Parallel version
-    with Pool(args.num_threads) as pool:
-        max_per_shard = pool.map(
-            partial(
-                reduce_max_text_length_on_shard,
-                num_shards=args.num_threads,
-                dataset=dataset,
-                batch_size=args.load_batch_size,
-            ),
-            range(args.num_threads)
-        )
-        max_length=max(max_per_shard)
-    logger.info(f"Max length: {max_length}")
+    # # Parallel version
+    # with Pool(args.num_threads) as pool:
+    #     max_per_shard = pool.map(
+    #         partial(
+    #             reduce_max_text_length_on_shard,
+    #             num_shards=args.num_threads,
+    #             dataset=dataset,
+    #             batch_size=args.load_batch_size,
+    #         ),
+    #         range(args.num_threads)
+    #     )
+    #     max_length=max(max_per_shard)
+    # logger.info(f"Max length: {max_length}")
 
     spm.SentencePieceTrainer.train(
-        sentence_iterator=dataset_iterator(dataset, args.load_batch_size),
+        sentence_iterator=dataset_iterator(dataset, args.load_batch_size, args.max_sequence_length),
         model_prefix=str(tokenizer_path.absolute()),
         vocab_size=args.vocab_size,
         model_type="bpe",
-        max_sentence_length=max_length,
+        max_sentence_length=args.max_sequence_length,
         num_threads=args.num_threads,
         unk_id=0,
         bos_id=1,

@@ -32,12 +32,13 @@ export HF_DATASETS_CACHE=$SCRATCH/to_delete
 #   - ceil(150_000 / (8 * 128)) * 8 * 128
 #   - special tokens:
 #       - 200 sentinel tokens
-# ceil(150_000 / (8 * 128)) * 8 * 128 - 200 = 150325
+# ceil(150_000 / (8 * 128)) * 8 * 128 - 200 = 150328
 
 python train_convert_tokenizer_simple.py \
-    --vocab_size 150325 \
+    --vocab_size 150328 \
     --data_name ${DATASET_PATH} \
     --output_folder ${SAVE_TOKENIZER_PATH} \
     --load_batch_size 1000 \
+    --max_sequence_length 1000000 \
     --num_threads 80
 
