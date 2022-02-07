@@ -110,7 +110,7 @@ def main():
         model_prefix=str(tokenizer_path.absolute()),
         vocab_size=args.vocab_size,
         model_type="bpe",
-        max_sentence_length=args.max_sequence_length,
+        max_sentence_length=args.max_sequence_length * 2, # number of bytes main be bigger than the number of tokens.
         num_threads=args.num_threads,
         unk_id=0,
         bos_id=1,
