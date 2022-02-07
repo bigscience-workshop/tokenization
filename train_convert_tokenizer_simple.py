@@ -42,6 +42,7 @@ def dataset_iterator(dataset, batch_size: int, sequence_length: int):
                 continue
 
             text = text.strip()
+            text.encode('utf-8')
 
             # shard text to be into substrings of size < sequence length
             rest = text
