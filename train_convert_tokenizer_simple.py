@@ -21,6 +21,7 @@ def get_args():
     parser.add_argument("--num_threads", "-th", type=int, required=True)
     parser.add_argument("--load_batch_size", type=int, default=1)
     parser.add_argument("--max_sequence_length", type=int, required=True)
+    parser.add_argument("--input_sentence_size", type=int, required=True)
 
     return parser.parse_args()
 
@@ -113,6 +114,8 @@ def main():
             args.load_batch_size,
             sequence_length_in_byte=args.max_sequence_length
         ),
+        input_sentence_size=args.input_sentence_size,
+        shuffle_input_sentence=True,
         model_prefix=str(tokenizer_path.absolute()),
         vocab_size=args.vocab_size,
         model_type="bpe",
