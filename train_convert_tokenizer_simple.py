@@ -51,7 +51,7 @@ def dataset_iterator(dataset, batch_size: int, sequence_length: int):
             rest = text
             while rest != "":
                 substring = rest[:sequence_length].rsplit(" ", 1)[0]
-                rest = text[len(substring):]
+                rest = rest[len(substring):]
                 yield substring
 
 class SPMTokenizer:
