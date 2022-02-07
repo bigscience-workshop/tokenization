@@ -26,7 +26,7 @@ def get_args():
 
 def dataset_iterator(dataset, batch_size: int, sequence_length_in_byte: int):
     # FIXME: we use an approximation of byte length vs byte sequence
-    sequence_length = sequence_length_in_byte // 2
+    sequence_length = sequence_length_in_byte // 3
 
     slices = [(start, min(len(dataset), start + batch_size)) for start in range(0, len(dataset), batch_size)]
     for start, end in utils.tqdm(
