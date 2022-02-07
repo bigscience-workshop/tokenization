@@ -47,12 +47,19 @@ def dataset_iterator(dataset, batch_size: int, sequence_length: int):
             rest = text
             while rest != "":
                 if len(rest) <= sequence_length:
-                    yield rest.strip()
+                    # Sort sequence: we fit everything in size one line
+                    yield rest
                     rest = ""
                 else:
-                    substring = rest[:sequence_length].rsplit(" ", 1)[0]
+                    candidates = rest[:sequence_length]
+                    matches = candidates.rsplit(" ", 1)
+                    if matches[0] == "":
+                        # If whitespace is the first and only occurence in the sequence, We just feed everything
+                        substring = candidates
+                    else:
+                        substring = matches[0]
                     rest = rest[len(substring):]
-                    yield substring.strip()
+                    yield substring
 
 class SPMTokenizer:
     def __init__(self, vocab_file):
