@@ -51,12 +51,12 @@ def dataset_iterator(dataset, batch_size: int, sequence_length: int):
             rest = text
             while rest != "":
                 if len(rest) <= sequence_length:
-                    yield rest
+                    yield rest.strip()
                     rest = ""
                 else:
                     substring = rest[:sequence_length].rsplit(" ", 1)[0]
                     rest = rest[len(substring):]
-                    yield substring
+                    yield substring.strip()
 
 class SPMTokenizer:
     def __init__(self, vocab_file):
