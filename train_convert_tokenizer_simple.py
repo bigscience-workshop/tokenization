@@ -1,14 +1,13 @@
 import logging
-from functools import partial
-from multiprocessing import Pool
 from pathlib import Path
-from typing import Callable
+from typing import List
 
 import sentencepiece as spm
-from datasets import load_dataset, utils, Dataset
+from datasets import load_dataset, utils
 from datasets.utils.logging import set_verbosity_info
 from transformers.convert_slow_tokenizer import SpmConverter
-import argparse, os
+from transformers import PreTrainedTokenizerFast
+import argparse
 
 set_verbosity_info()
 logger = logging.getLogger(__name__)
@@ -39,30 +38,45 @@ def dataset_iterator(dataset, batch_size: int, sequence_length_in_byte: int):
     ):
         # Load things by batch.
         batch = dataset[start: end]
-        for text in batch["text"]:
-            # Removes None
-            if not text:
-                continue
+        batch_results = preprocess_text(batch, sequence_length)
+        for row_results in batch_results:
+            for text in row_results:
+                yield text
 
-            text = text.strip()
+def preprocess_text(batch, sequence_length: int) -> List[List[str]]:
+    batch_results = []
+    for text in batch["text"]:
+        row_results = []
 
-            # shard text to be into substrings of size < sequence length
-            rest = text
-            while rest != "":
-                if len(rest) <= sequence_length:
-                    # Sort sequence: we fit everything in size one line
-                    yield rest
-                    rest = ""
+        # Removes None
+        if not text:
+            continue
+
+        text = text.strip()
+
+        # shard text to be into substrings of size < sequence length
+        start = 0
+        end = sequence_length
+        while end - start != 0:
+            if end - start <= sequence_length:
+                # Sort sequence: we fit everything in size one line
+                row_results.append(text[start: end])
+                start = end
+            else:
+                candidates = text[start:end]
+                matches = candidates.rsplit(" ", 1)
+                if matches[0] == "":
+                    # If whitespace is the first and only occurence in the sequence, We just feed everything
+                    substring = candidates
                 else:
-                    candidates = rest[:sequence_length]
-                    matches = candidates.rsplit(" ", 1)
-                    if matches[0] == "":
-                        # If whitespace is the first and only occurence in the sequence, We just feed everything
-                        substring = candidates
-                    else:
-                        substring = matches[0]
-                    rest = rest[len(substring):]
-                    yield substring
+                    substring = matches[0]
+
+                start = len(substring)
+                end = start + min(sequence_length, len(text))
+                row_results.append(substring)
+
+        batch_results.append(row_results)
+    return batch_results
 
 class SPMTokenizer:
     def __init__(self, vocab_file):
@@ -129,12 +143,24 @@ def main():
         train_extremely_large_corpus=True
     )
 
-    spm_model_path = tokenizer_path.rename(f"{tokenizer_path.name}.model")
-    original_tokenizer = SPMTokenizer(spm_model_path)
+    spm_model_path = tokenizer_path / f"tokenizer.model"
+    original_tokenizer = SPMTokenizer(str(spm_model_path.absolute()))
     converter = SpmConverter(original_tokenizer)
     hf_tokenizer = converter.converted()
-    tokenizer_json = tokenizer_path.rename(f"{tokenizer_path.name}.json")
+    tokenizer_json = tokenizer_path / f"tokenizer.json"
     hf_tokenizer.save(str(tokenizer_json.absolute()))
+
+    # WIP:
+    tokenizer = PreTrainedTokenizerFast(
+        tokenizer_object = hf_tokenizer,
+        unk_token="<unk>",
+        eos_token="</s>",
+        bos_token="<s>",
+        pad_token="<pad>",
+    )
+    tokenizer.save_pretrained(
+        tokenizer_path / f"tokenizer_hf"
+    )
 
 if __name__ == "__main__":
     main()

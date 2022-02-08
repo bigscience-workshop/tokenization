@@ -21,7 +21,6 @@ pushd $TOKENIZATION_REPO
 echo "Sharding and compressing seed id ${SEED_ID}"
 
 DATASET_PATH=$six_ALL_CCFRSCRATCH/tokenizer/dataset/tokenization_dataset # TODO: define where is concatenated dataset
-SAVE_TOKENIZER_PATH=$six_ALL_CCFRSCRATCH/tokenizer/tokenizer
 
 mkdir -p $SAVE_TOKENIZER_PATH
 
@@ -37,9 +36,7 @@ export HF_DATASETS_CACHE=$SCRATCH/to_delete
 python train_convert_tokenizer_simple.py \
     --vocab_size 150328 \
     --data_name ${DATASET_PATH} \
-    --output_folder ${SAVE_TOKENIZER_PATH} \
     --load_batch_size 1000 \
     --input_sentence_size 12000000 \
     --max_sequence_length 65536 \
     --num_threads 80
-
