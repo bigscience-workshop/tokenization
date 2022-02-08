@@ -18,6 +18,8 @@ TOKENIZATION_REPO=$WORK/code/big_science/tokenization
 
 pushd $TOKENIZATION_REPO
 
+export HF_DATASETS_OFFLINE=1
+
 python compare_tokenizers.py \
     --dataset-name xnli \
     --subset-name en \
