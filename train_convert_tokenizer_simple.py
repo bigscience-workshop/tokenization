@@ -129,7 +129,7 @@ def main():
             sequence_length_in_byte=args.max_sequence_length
         ),
         input_sentence_size=args.input_sentence_size,
-        shuffle_input_sentence=True,
+        shuffle_input_sentence=args.input_sentence_size > 0,
         model_prefix=str(tokenizer_path.absolute()),
         vocab_size=args.vocab_size,
         model_type="bpe",
@@ -143,6 +143,7 @@ def main():
         train_extremely_large_corpus=True
     )
 
+    logger.info("Done training the tokenizer. Starting tokenizer conversion")
     spm_model_path = tokenizer_path / f"tokenizer.model"
     original_tokenizer = SPMTokenizer(str(spm_model_path.absolute()))
     converter = SpmConverter(original_tokenizer)
@@ -161,6 +162,8 @@ def main():
     tokenizer.save_pretrained(
         tokenizer_path / f"tokenizer_hf"
     )
+
+    logger.info("Done converting and saving the tokenizer.")
 
 if __name__ == "__main__":
     main()
