@@ -23,6 +23,7 @@ def get_args():
     parser.add_argument("--max_sequence_length", type=int, required=True)
     parser.add_argument("--input_sentence_size", type=int, required=True)
     parser.add_argument("--nomalizer", type=int, required=True)
+    parser.add_argument("--remove-extra-whitespaces", action="store_true")
 
     return parser.parse_args()
 
@@ -149,7 +150,8 @@ def main():
         pad_id=3,
         byte_fallback=True,
         train_extremely_large_corpus=True,
-        normalization_rule_name=args.normalizer
+        normalization_rule_name=args.normalizer,
+        remove_extra_whitespaces=args.remove_extra_whitespaces
     )
 
     spm_model_path = tokenizer_path / f"tokenizer.model"
