@@ -58,8 +58,8 @@ def preprocess_text(batch, sequence_length: int) -> List[List[str]]:
         start = 0
         end = sequence_length
         while end - start != 0:
-            if end - start <= sequence_length:
-                # Sort sequence: we fit everything in size one line
+            if end - start < sequence_length or len(text) < sequence_length:
+                # Short sequence: we fit everything in size one line
                 row_results.append(text[start: end])
                 start = end
             else:
@@ -71,8 +71,8 @@ def preprocess_text(batch, sequence_length: int) -> List[List[str]]:
                 else:
                     substring = matches[0]
 
-                start = len(substring)
-                end = start + min(sequence_length, len(text))
+                start += len(substring)
+                end = min(start + sequence_length, len(text))
                 row_results.append(substring)
 
         batch_results.append(row_results)

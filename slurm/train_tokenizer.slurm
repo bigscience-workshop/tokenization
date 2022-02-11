@@ -2,10 +2,10 @@
 #SBATCH --job-name=train_tokenizer
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1          # crucial - only 1 task per dist per node!
-#SBATCH --cpus-per-task=1         # number of cores per tasks
+#SBATCH --cpus-per-task=40         # number of cores per tasks
 #SBATCH --hint=nomultithread         # we get physical cores not logical
 #SBATCH --partition=cpu_p1
-#SBATCH --time 2:00:00              # maximum execution time (HH:MM:SS)
+#SBATCH --time 20:00:00              # maximum execution time (HH:MM:SS)
 #SBATCH --output=logs/train_tokenizer/%x-%j.out           # output file name
 #SBATCH --account=six@cpu
 
@@ -20,8 +20,8 @@ pushd $TOKENIZATION_REPO
 
 echo "Sharding and compressing seed id ${SEED_ID}"
 
-DATASET_PATH=$six_ALL_CCFRSCRATCH/tokenizer/dataset/tokenization_dataset # TODO: define where is concatenated dataset
-SAVE_TOKENIZER_PATH=$six_ALL_CCFRSCRATCH/tokenizer/tokenizer_roman
+DATASET_PATH=$six_ALL_CCFRSCRATCH/tokenizer/dataset/tokenization_dataset_v2 # TODO: define where is concatenated dataset
+SAVE_TOKENIZER_PATH=$six_ALL_CCFRSCRATCH/tokenizer/tokenizer_ratios_v2
 
 mkdir -p $SAVE_TOKENIZER_PATH
 
