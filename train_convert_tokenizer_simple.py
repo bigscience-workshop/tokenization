@@ -1,6 +1,7 @@
 import logging
 from pathlib import Path
 from typing import List
+import math
 
 import sentencepiece as spm
 from datasets import load_dataset, utils
@@ -25,8 +26,6 @@ def get_args():
     return parser.parse_args()
 
 def dataset_iterator(dataset, batch_size: int, sequence_length_in_byte: int):
-    # FIXME: we use an approximation of byte length vs byte sequence
-    sequence_length = sequence_length_in_byte // 2
 
     slices = [(start, min(len(dataset), start + batch_size)) for start in range(0, len(dataset), batch_size)]
     for start, end in utils.tqdm(
@@ -38,12 +37,12 @@ def dataset_iterator(dataset, batch_size: int, sequence_length_in_byte: int):
     ):
         # Load things by batch.
         batch = dataset[start: end]
-        batch_results = preprocess_text(batch, sequence_length)
+        batch_results = preprocess_text(batch, sequence_length_in_byte)
         for row_results in batch_results:
             for text in row_results:
                 yield text
 
-def preprocess_text(batch, sequence_length: int) -> List[List[str]]:
+def preprocess_text(batch, sequence_length_in_byte: int) -> List[List[str]]:
     batch_results = []
     for text in batch["text"]:
         row_results = []
@@ -54,6 +53,12 @@ def preprocess_text(batch, sequence_length: int) -> List[List[str]]:
 
         text = text.strip()
 
+        # Compute an average of the number of bytes needed to encode a character for that sequence
+        # Needed since it will vary a lot depending on the language.
+        avg_bytes_per_character = math.ceil(len(text.encode('utf8')) / len(text))
+
+        sequence_length = sequence_length_in_byte // avg_bytes_per_character
+        
         # shard text to be into substrings of size < sequence length
         start = 0
         end = sequence_length
