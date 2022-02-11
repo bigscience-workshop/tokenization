@@ -71,8 +71,8 @@ def preprocess_text(batch, sequence_length: int) -> List[List[str]]:
                 else:
                     substring = matches[0]
 
-                start = len(substring)
-                end = start + min(sequence_length, len(text))
+                start += len(substring)
+                end = min(start + sequence_length, len(text))
                 row_results.append(substring)
 
         batch_results.append(row_results)
