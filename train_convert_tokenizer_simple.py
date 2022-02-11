@@ -22,6 +22,7 @@ def get_args():
     parser.add_argument("--load_batch_size", type=int, default=1)
     parser.add_argument("--max_sequence_length", type=int, required=True)
     parser.add_argument("--input_sentence_size", type=int, required=True)
+    parser.add_argument("--nomalizer", type=int, required=True)
 
     return parser.parse_args()
 
@@ -147,7 +148,8 @@ def main():
         eos_id=2,
         pad_id=3,
         byte_fallback=True,
-        train_extremely_large_corpus=True
+        train_extremely_large_corpus=True,
+        normalization_rule_name=args.normalizer
     )
 
     spm_model_path = tokenizer_path / f"tokenizer.model"
