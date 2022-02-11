@@ -53,6 +53,9 @@ def preprocess_text(batch, sequence_length_in_byte: int) -> List[List[str]]:
 
         text = text.strip()
 
+        if len(text) == 0:
+            continue
+
         # Compute an average of the number of bytes needed to encode a character for that sequence
         # Needed since it will vary a lot depending on the language.
         avg_bytes_per_character = math.ceil(len(text.encode('utf8')) / len(text))
@@ -104,7 +107,7 @@ def main():
     )
     tokenizer_path = args.output_folder / "tokenizer"
 
-    dataset = load_dataset(args.data_name, data_files="**.jsonl.gz", split="train")
+    dataset = load_dataset(args.data_name, data_files="**.jsonl", split="train")
 
     logger.info(f"Dataset length: {len(dataset)}")
     # max_length = 0
