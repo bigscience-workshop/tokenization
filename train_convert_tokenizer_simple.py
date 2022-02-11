@@ -22,7 +22,7 @@ def get_args():
     parser.add_argument("--load_batch_size", type=int, default=1)
     parser.add_argument("--max_sequence_length", type=int, required=True)
     parser.add_argument("--input_sentence_size", type=int, required=True)
-    parser.add_argument("--normalizer", type=int, required=True)
+    parser.add_argument("--normalizer", type=str, required=True)
     parser.add_argument("--remove-extra-whitespaces", action="store_true")
 
     return parser.parse_args()
