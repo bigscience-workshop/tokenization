@@ -4,8 +4,11 @@ TOKENIZATION_REPO=~/code/tokenization
 
 pushd $TOKENIZATION_REPO
 
+TOKENIZER_NAME=tokenizer_alpha_weight_fixed_NFKC_split_digits
+
 DATASET_PATH=~/tokenization_dataset/alpha # TODO: define where is concatenated dataset
-SAVE_TOKENIZER_PATH=~/tokenizer/tokenizer_alpha_weight_fixed_NFKC_no_split_numbers
+SAVE_TOKENIZER_PATH=~/tokenizer/$TOKENIZER_NAME
+LOGS_PATH=~/logs
 
 mkdir -p $SAVE_TOKENIZER_PATH
 
@@ -28,4 +31,5 @@ python train_convert_tokenizer_simple.py \
     --max_sequence_length 8192 \
     --num_threads 48 \
     --normalizer nfkc \
-    --split_digits
+    --split_digits \
+    2>&1 | tee $LOGS_PATH/$TOKENIZER_NAME.txt
