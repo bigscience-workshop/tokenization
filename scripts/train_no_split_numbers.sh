@@ -2,7 +2,7 @@ set -x -e
 
 TOKENIZATION_REPO=~/code/tokenization
 
-pushd $TOKENIZATION_REPO
+cd $TOKENIZATION_REPO
 
 TOKENIZER_NAME=tokenizer_alpha_weight_fixed_NFKC_no_split_numbers
 
