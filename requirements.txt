@@ -1,0 +1,4 @@
+sentencepiece
+datasets
+git+https://github.com/huggingface/tokenizers.git@bigscience_fork
+transformers
