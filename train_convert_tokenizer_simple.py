@@ -158,23 +158,23 @@ def main():
         split_digits=args.split_digits,
     )
 
-    spm_model_path = tokenizer_path / f"tokenizer.model"
+    spm_model_path = args.output_folder / f"tokenizer.model"
     original_tokenizer = SPMTokenizer(str(spm_model_path.absolute()))
     converter = SpmConverter(original_tokenizer)
     hf_tokenizer = converter.converted()
-    tokenizer_json = tokenizer_path / f"tokenizer.json"
+    tokenizer_json = args.output_folder / f"tokenizer.json"
     hf_tokenizer.save(str(tokenizer_json.absolute()))
 
     # WIP:
     tokenizer = PreTrainedTokenizerFast(
-        tokenizer_object = hf_tokenizer,
+        tokenizer_file=str(tokenizer_json.absolute()),
         unk_token="<unk>",
         eos_token="</s>",
         bos_token="<s>",
         pad_token="<pad>",
     )
     tokenizer.save_pretrained(
-        tokenizer_path / f"tokenizer_hf"
+        args.output_folder / f"tokenizer_hf"
     )
 
 if __name__ == "__main__":
