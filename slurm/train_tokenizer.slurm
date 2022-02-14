@@ -41,7 +41,7 @@ python train_convert_tokenizer_simple.py \
     --output_folder ${SAVE_TOKENIZER_PATH} \
     --load_batch_size 1000 \
     --input_sentence_size 12000000 \
-    --max_sequence_length 4192 \
+    --max_sequence_length 8192 \
     --num_threads 80 \
     --normalizer nfkc
 
