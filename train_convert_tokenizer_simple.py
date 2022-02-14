@@ -25,7 +25,7 @@ def get_args():
     parser.add_argument("--normalizer", type=str, required=True)
     parser.add_argument("--remove-extra-whitespaces", action="store_true")
     parser.add_argument("--split_by_number", action="store_true")
-    parser.add_argument("--split_by_digits", action="store_true")
+    parser.add_argument("--split_digits", action="store_true")
 
     return parser.parse_args()
 
