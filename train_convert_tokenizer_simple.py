@@ -24,6 +24,8 @@ def get_args():
     parser.add_argument("--input_sentence_size", type=int, required=True)
     parser.add_argument("--normalizer", type=str, required=True)
     parser.add_argument("--remove-extra-whitespaces", action="store_true")
+    parser.add_argument("--split_by_number", action="store_true")
+    parser.add_argument("--split_by_digits", action="store_true")
 
     return parser.parse_args()
 
@@ -108,7 +110,7 @@ def main():
     )
     tokenizer_path = args.output_folder / "tokenizer"
 
-    dataset = load_dataset(args.data_name, data_files="**.jsonl.gz", split="train")
+    dataset = load_dataset(args.data_name, data_files="**.jsonl", split="train")
 
     logger.info(f"Dataset length: {len(dataset)}")
     # max_length = 0
@@ -151,7 +153,9 @@ def main():
         byte_fallback=True,
         train_extremely_large_corpus=True,
         normalization_rule_name=args.normalizer,
-        remove_extra_whitespaces=args.remove_extra_whitespaces
+        remove_extra_whitespaces=args.remove_extra_whitespaces,
+        split_by_number=args.split_by_number,
+        split_digits=args.split_digits,
     )
 
     spm_model_path = tokenizer_path / f"tokenizer.model"
