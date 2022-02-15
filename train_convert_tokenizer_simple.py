@@ -22,6 +22,8 @@ def get_args():
     parser.add_argument("--load_batch_size", type=int, default=1)
     parser.add_argument("--max_sequence_length", type=int, required=True)
     parser.add_argument("--input_sentence_size", type=int, required=True)
+    parser.add_argument("--normalizer", type=str, default="nmt_nfkc")
+    parser.add_argument("--remove-extra-whitespaces", action="store_true")
 
     return parser.parse_args()
 
@@ -148,15 +150,17 @@ def main():
         eos_id=2,
         pad_id=3,
         byte_fallback=True,
-        train_extremely_large_corpus=True
+        train_extremely_large_corpus=True,
+        normalization_rule_name=args.normalizer,
+        remove_extra_whitespaces=args.remove_extra_whitespaces
     )
 
     logger.info("Done training the tokenizer. Starting tokenizer conversion")
-    spm_model_path = tokenizer_path / f"tokenizer.model"
+    spm_model_path = tokenizer_path.with_suffix(".model")
     original_tokenizer = SPMTokenizer(str(spm_model_path.absolute()))
     converter = SpmConverter(original_tokenizer)
     hf_tokenizer = converter.converted()
-    tokenizer_json = tokenizer_path / f"tokenizer.json"
+    tokenizer_json = tokenizer_path.with_suffix(".json")
     hf_tokenizer.save(str(tokenizer_json.absolute()))
 
     # WIP:
