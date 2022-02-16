@@ -48,8 +48,12 @@ def _add_empty_strings(data):
         "type": "Sequence",
         "normalizers": [
             data["normalizer"],
-            {"type": "Replace", "pattern": {"Regex": "^ "}, "content": ""},
+            {"type": "Replace", "pattern": {"Regex": "\n"}, "content": "\n "},
+            # ^ matches beginning of string as well as beginning of lines in multiline mode.
+            {"type": "Replace", "pattern": {"Regex": "^ "}, "content": ""},  # add_prefix_space
             {"type": "Replace", "pattern": {"Regex": "^"}, "content": " "},
+            {"type": "Replace", "pattern": {"Regex": "\n "}, "content": "\n"},
+            # ^ matches beginning of string as well as beginning of lines in multiline mode.
             {"type": "Replace", "pattern": {"String": " "}, "content": "▁"},
 
         ]}
