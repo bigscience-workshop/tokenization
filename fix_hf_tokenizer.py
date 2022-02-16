@@ -29,41 +29,41 @@ def _add_empty_strings(data):
     num_max_spaces = 20
     space_char = "▁"
 
-    offset_idx = len(data["model"]["vocab"]) - 2
-    for idx in range(num_max_spaces, 1, -1):
-        print(idx + offset_idx, " : ", space_char * idx, " : ", len(space_char * idx))
-        data["model"]["vocab"][space_char * idx] = idx + offset_idx
+    if space_char * 2 not in data["model"]["vocab"]:
+        offset_idx = len(data["model"]["vocab"]) - 2
+        for idx in range(num_max_spaces, 1, -1):
+            print(idx + offset_idx, " : ", space_char * idx, " : ", len(space_char * idx))
+            data["model"]["vocab"][space_char * idx] = idx + offset_idx
 
-    lines_to_append = []
-    for tup in itertools.product([space_char * idx for idx in range(1, num_max_spaces - 1)], repeat=2):
-        merge_rule = " ".join(tup)
-        if len(merge_rule) < num_max_spaces + 1:
-            lines_to_append.append(merge_rule)
-    lines_to_append = sorted(lines_to_append, key=lambda x: len(x))
+        lines_to_append = []
+        for tup in itertools.product([space_char * idx for idx in range(1, num_max_spaces - 1)], repeat=2):
+            merge_rule = " ".join(tup)
+            if len(merge_rule) < num_max_spaces + 1:
+                lines_to_append.append(merge_rule)
+        lines_to_append = sorted(lines_to_append, key=lambda x: len(x))
 
-    data["model"]["merges"].extend(lines_to_append)
+        data["model"]["merges"].extend(lines_to_append)
 
-    # Fixing the whole tokenizer.
-    data["normalizer"] = {
-        "type": "Sequence",
-        "normalizers": [
-            data["normalizer"],
-            {"type": "Replace", "pattern": {"Regex": "\n"}, "content": "\n "},
-            # ^ matches beginning of string as well as beginning of lines in multiline mode.
-            {"type": "Replace", "pattern": {"Regex": "^ "}, "content": ""},  # add_prefix_space
-            {"type": "Replace", "pattern": {"Regex": "^"}, "content": " "},
-            {"type": "Replace", "pattern": {"Regex": "\n "}, "content": "\n"},
-            # ^ matches beginning of string as well as beginning of lines in multiline mode.
-            {"type": "Replace", "pattern": {"String": " "}, "content": "▁"},
+        # Fixing the whole tokenizer.
+        data["normalizer"] = {
+            "type": "Sequence",
+            "normalizers": [
+                data["normalizer"],
+                {"type": "Replace", "pattern": {"Regex": "\n"}, "content": "\n "},
+                # ^ matches beginning of string as well as beginning of lines in multiline mode.
+                {"type": "Replace", "pattern": {"Regex": "^ "}, "content": ""},  # add_prefix_space
+                {"type": "Replace", "pattern": {"Regex": "^"}, "content": " "},
+                {"type": "Replace", "pattern": {"Regex": "\n "}, "content": "\n"},
+                # ^ matches beginning of string as well as beginning of lines in multiline mode.
+                {"type": "Replace", "pattern": {"String": " "}, "content": "▁"},
+            ]}
 
-        ]}
-
-    data["pre_tokenizer"] = None
-    data["decoder"] = {
-        "type": "Metaspace",
-        "replacement": "▁",
-        "add_prefix_space": True
-    }
+        data["pre_tokenizer"] = None
+        data["decoder"] = {
+            "type": "Metaspace",
+            "replacement": "▁",
+            "add_prefix_space": True
+        }
     return data
 
 
